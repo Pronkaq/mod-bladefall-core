@@ -11,6 +11,11 @@
 
 namespace
 {
+enum BladeFallArmorProficiencySpells : uint32
+{
+    SPELL_PLATE_MAIL = 750,
+    SPELL_MAIL_ARMOR = 8737
+};
 enum BladeFallStarterItems : uint32
 {
     // Cloth armor
@@ -71,6 +76,39 @@ void GiveItems(Player* player, std::initializer_list<uint32> itemIds)
 {
     for (uint32 itemId : itemIds)
         player->StoreNewItemInBestSlots(itemId, 1);
+}
+
+void LearnSpellIfMissing(Player* player, uint32 spellId)
+{
+    if (!player->HasSpell(spellId))
+        player->learnSpell(spellId);
+}
+
+void LearnStarterArmorProficiency(Player* player)
+{
+    switch (player->getClass())
+    {
+        case CLASS_WARRIOR:
+        case CLASS_PALADIN:
+        case CLASS_DEATH_KNIGHT:
+            LearnSpellIfMissing(player, SPELL_PLATE_MAIL);
+            break;
+        case CLASS_HUNTER:
+        case CLASS_SHAMAN:
+            LearnSpellIfMissing(player, SPELL_MAIL_ARMOR);
+            break;
+        default:
+            break;
+    }
+}
+
+void RemoveExistingEquipment(Player* player)
+{
+    for (uint8 slot = EQUIPMENT_SLOT_START; slot < EQUIPMENT_SLOT_END; ++slot)
+    {
+        if (player->GetItemByPos(INVENTORY_SLOT_BAG_0, slot))
+            player->DestroyItem(INVENTORY_SLOT_BAG_0, slot, true);
+    }
 }
 
 void GiveClothArmor(Player* player)
@@ -138,6 +176,9 @@ void GivePlateArmor(Player* player)
 
 void GiveBladeFallStarterGear(Player* player)
 {
+    LearnStarterArmorProficiency(player);
+    RemoveExistingEquipment(player);
+	
     switch (player->getClass())
     {
         case CLASS_WARRIOR:
