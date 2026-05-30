@@ -11,18 +11,23 @@
 
 namespace
 {
-enum BladeFallArmorProficiencySpells : uint32
-{
-    SPELL_PLATE_MAIL = 750,
-    SPELL_MAIL_ARMOR = 8737
-};
 enum BladeFallStarterItems : uint32
 {
+    // Shared armor
+    ITEM_SHARED_NECK     = 25803,
+    ITEM_SHARED_CLOAK    = 25805,
+    ITEM_SHARED_RING_1   = 24087,
+    ITEM_SHARED_RING_2   = 25804,
+    ITEM_SHARED_TRINKET_1 = 30300,
+    ITEM_SHARED_TRINKET_2 = 32864,
+
     // Cloth armor
     ITEM_CLOTH_HEAD      = 31220,
     ITEM_CLOTH_SHOULDERS = 31162,
     ITEM_CLOTH_CHEST     = 31158,
+    ITEM_CLOTH_WAIST     = 24661,
     ITEM_CLOTH_LEGS      = 31212,
+    ITEM_CLOTH_FEET      = 31216,
     ITEM_CLOTH_WRISTS    = 24668,
     ITEM_CLOTH_HANDS     = 24664,
 
@@ -57,26 +62,24 @@ enum BladeFallStarterItems : uint32
     ITEM_PLATE_HANDS     = 25001,
 
     // Weapons and shields
-    ITEM_ONE_HAND_AXE      = 25208,
-    ITEM_TWO_HAND_AXE      = 25222,
-    ITEM_BOW               = 25250,
-    ITEM_ONE_HAND_MACE     = 25124,
-    ITEM_TWO_HAND_MACE     = 25138,
-    ITEM_TWO_HAND_POLEARM  = 25236,
-    ITEM_ONE_HAND_SWORD    = 25152,
-    ITEM_TWO_HAND_SWORD    = 25166,
-    ITEM_STAFF             = 31289,
-    ITEM_MAIN_HAND_FIST    = 29371,
-    ITEM_OFF_HAND_FIST     = 29372,
-    ITEM_WAND              = 25292,
-    ITEM_SHIELD            = 31287
+    ITEM_ONE_HAND_AXE     = 25208,
+    ITEM_TWO_HAND_AXE     = 25222,
+    ITEM_BOW              = 25250,
+    ITEM_ONE_HAND_MACE    = 25124,
+    ITEM_TWO_HAND_MACE    = 25138,
+    ITEM_TWO_HAND_POLEARM = 25236,
+    ITEM_STAFF            = 31289,
+    ITEM_MAIN_HAND_FIST   = 29371,
+    ITEM_OFF_HAND_FIST    = 29372,
+    ITEM_WAND             = 25292,
+    ITEM_SHIELD           = 31287
 };
 
-void GiveItems(Player* player, std::initializer_list<uint32> itemIds)
+enum BladeFallArmorProficiencySpells : uint32
 {
-    for (uint32 itemId : itemIds)
-        player->StoreNewItemInBestSlots(itemId, 1);
-}
+    SPELL_PLATE_MAIL = 750,
+    SPELL_MAIL_ARMOR = 8737
+};
 
 void LearnSpellIfMissing(Player* player, uint32 spellId)
 {
@@ -111,6 +114,26 @@ void RemoveExistingEquipment(Player* player)
     }
 }
 
+void GiveItems(Player* player, std::initializer_list<uint32> itemIds)
+{
+    for (uint32 itemId : itemIds)
+        player->StoreNewItemInBestSlots(itemId, 1);
+}
+
+void GiveSharedArmor(Player* player)
+{
+    GiveItems(
+        player,
+        {
+            ITEM_SHARED_NECK,
+            ITEM_SHARED_CLOAK,
+            ITEM_SHARED_RING_1,
+            ITEM_SHARED_RING_2,
+            ITEM_SHARED_TRINKET_1,
+            ITEM_SHARED_TRINKET_2
+        });
+}
+
 void GiveClothArmor(Player* player)
 {
     GiveItems(
@@ -119,7 +142,9 @@ void GiveClothArmor(Player* player)
             ITEM_CLOTH_HEAD,
             ITEM_CLOTH_SHOULDERS,
             ITEM_CLOTH_CHEST,
+            ITEM_CLOTH_WAIST,
             ITEM_CLOTH_LEGS,
+            ITEM_CLOTH_FEET,
             ITEM_CLOTH_WRISTS,
             ITEM_CLOTH_HANDS
         });
@@ -178,7 +203,8 @@ void GiveBladeFallStarterGear(Player* player)
 {
     LearnStarterArmorProficiency(player);
     RemoveExistingEquipment(player);
-	
+    GiveSharedArmor(player);
+
     switch (player->getClass())
     {
         case CLASS_WARRIOR:
