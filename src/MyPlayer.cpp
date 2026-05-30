@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
+ * BladeFall core module
  */
 
 #include "Chat.h"
@@ -7,62 +7,58 @@
 #include "Player.h"
 #include "ScriptMgr.h"
 
-enum MyPlayerAcoreString
-{
-    HELLO_WORLD = 35410
-};
-
-enum class MyConfig
+enum class BladeFallConfig
 {
     ENABLED,
-
-    NUM_CONFIGS,
+    LOGIN_MESSAGE,
+    NUM_CONFIGS
 };
 
-class MyConfigData : public ConfigValueCache<MyConfig>
+class BladeFallConfigData : public ConfigValueCache<BladeFallConfig>
 {
 public:
-    MyConfigData() : ConfigValueCache(MyConfig::NUM_CONFIGS) { };
+    BladeFallConfigData() : ConfigValueCache(BladeFallConfig::NUM_CONFIGS) { }
 
     void BuildConfigCache() override
     {
-        SetConfigValue<bool>(MyConfig::ENABLED, "MyModule.Enable", true);
+        SetConfigValue<bool>(BladeFallConfig::ENABLED, "BladeFall.Enable", true);
+        SetConfigValue<std::string>(
+            BladeFallConfig::LOGIN_MESSAGE,
+            "BladeFall.LoginMessage",
+            "Welcome to BladeFall!");
     }
 };
 
-static MyConfigData myConfigData;
+static BladeFallConfigData bladeFallConfigData;
 
-// Add player scripts
-class MyPlayer : public PlayerScript
+class BladeFallPlayerScript : public PlayerScript
 {
 public:
-    MyPlayer() : PlayerScript("MyPlayer", {
-        PLAYERHOOK_ON_LOGIN
-    }) { }
+    BladeFallPlayerScript() : PlayerScript("BladeFallPlayerScript", { PLAYERHOOK_ON_LOGIN }) { }
 
     void OnPlayerLogin(Player* player) override
     {
-        if (myConfigData.GetConfigValue<bool>(MyConfig::ENABLED))
-            ChatHandler(player->GetSession()).PSendSysMessage(HELLO_WORLD);
+        if (!bladeFallConfigData.GetConfigValue<bool>(BladeFallConfig::ENABLED))
+            return;
+
+        ChatHandler(player->GetSession()).SendSysMessage(
+            bladeFallConfigData.GetConfigValue(BladeFallConfig::LOGIN_MESSAGE));
     }
 };
 
-class MyWorldScript : public WorldScript
+class BladeFallWorldScript : public WorldScript
 {
 public:
-    MyWorldScript() : WorldScript("MyWorldScript", {
-        WORLDHOOK_ON_BEFORE_CONFIG_LOAD
-    }) { }
+    BladeFallWorldScript() : WorldScript("BladeFallWorldScript", { WORLDHOOK_ON_BEFORE_CONFIG_LOAD }) { }
 
     void OnBeforeConfigLoad(bool reload) override
     {
-        myConfigData.Initialize(reload);
+        bladeFallConfigData.Initialize(reload);
     }
 };
 
-// Add all scripts in one
-void AddMyPlayerScripts()
+void AddBladeFallCoreScripts()
 {
-    new MyPlayer();
-    new MyWorldScript();
+    new BladeFallPlayerScript();
+    new BladeFallWorldScript();
 }

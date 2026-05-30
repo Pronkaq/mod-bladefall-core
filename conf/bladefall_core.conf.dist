@@ -1,0 +1,25 @@
+#
+# BladeFall core module configuration
+#
+
+[worldserver]
+
+########################################
+# BladeFall core module
+########################################
+
+#
+# BladeFall.Enable
+#   Description: Enables BladeFall core functionality.
+#   Default:     1
+#
+
+BladeFall.Enable = 1
+
+#
+# BladeFall.LoginMessage
+#   Description: Message displayed to a character after entering the world.
+#   Default:     "Welcome to BladeFall!"
+#
+
+BladeFall.LoginMessage = "Welcome to BladeFall!"
