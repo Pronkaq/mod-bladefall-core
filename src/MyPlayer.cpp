@@ -3,6 +3,7 @@
  */
 
 #include "Chat.h"
+#include "BladeFallStarterGear.h"
 #include "ConfigValueCache.h"
 #include "Player.h"
 #include "ScriptMgr.h"
@@ -146,6 +147,7 @@ public:
             return;
 
         GiveStarterBags(player);
+	GiveBladeFallStarterGear(player);
         LearnRidingAndFactionMount(player);
         TeleportToFactionCapital(player);
 
